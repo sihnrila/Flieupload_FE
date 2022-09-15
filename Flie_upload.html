@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>파일 업로드 기능 test</title>
+  <style>
+    .photo_review {
+      width: 600px;
+      background: #ccc;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .photo_review  ol {
+      padding-left: 0;
+      display: inline-flex;
+    }
+
+    .photo_review  li,
+    div>p {
+      background: #eee;
+      margin: 10px;
+      list-style-type: none;
+    }
+
+    .photo_review  img {
+      width: 74px;
+      height: 74px;
+      order: 1;
+    }
+
+    .photo_review  p {
+      line-height: 32px;
+      padding-left: 10px;
+    }
+
+    .photo_review  label
+    {
+      background-color: #7F9CCB;
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: none;
+      font-size: 0.8rem;
+      height: auto;
+    }
+
+    .photo_review button {
+      background-color: #7F9CCB;
+      margin: 2px;
+      border-radius: 50px;
+      position: absolute;
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <form class="photo_review" action="" method="">
+    <div>
+      <label for="image_uploads">파일 업로드</label>
+      <input type="file" id="image_uploads"  name="imagepush[]" class="review_input" accept=".jpg, .jpeg, .png" multiple>
+    </div>
+    <div class="preview">
+    </div>
+    <div>
+    </div>
+  </form>
+
+  <script>
+    const input = document.querySelector('input');
+    const preview = document.querySelector('.preview');
+
+    input.style.opacity = 0;
+
+    let imageCount = 0; //파일추가기능 변수설정 
+
+    const imagepush = []; //썸네일 배열
+
+    input.addEventListener('change', updateImageDisplay);
+
+    function updateImageDisplay() {
+      const imageFiles = input.files; //인풋 파일로더
+      const totalCount = 5; //전체 개수
+
+      //파일 첨부 
+      if (imageFiles.length + imageCount > totalCount) { // 업로드된 파일개수 + 변수 > 총개수업로드 되는 시점일때
+        alert("파일 첨부는 최대 5개까지 가능합니다.");
+        return;
+      } else {
+        
+        let imagesave = document.getElementsByName("imagepush[]")[0].value; //이미지 업로드 파일
+        imagepush.push(imagesave);//배열 담기 
+        console.log(imagepush);
+        
+        //업로드 된 시점일때
+        imageCount += imageFiles.length; // 변수 + =저장
+
+        const list = document.createElement('ol');
+        preview.appendChild(list);
+
+        for (const file of imageFiles) {
+          if (validFileType(file)) {
+            // 이미지 로딩 //수정 
+            const inputhidden = document.createElement('input'); //인풋 추가 
+            inputhidden.type = "hidden";
+            inputhidden.id = "image_hidden";
+            inputhidden.value = file;
+
+            const listItem = document.createElement('li');
+            const button = document.createElement('button');
+
+            const image = document.createElement('img');
+            
+            image.src = URL.createObjectURL(file);
+            button.innerText = 'x';
+            button.addEventListener("click", deleteImage);
+
+            listItem.appendChild(inputhidden);
+            listItem.appendChild(image);
+            listItem.appendChild(button);
+            list.appendChild(listItem); 
+          }
+        }
+      }
+  } 
+    //이미지 파일 타입 
+    const fileTypes = [
+      'image/apng',
+      'image/bmp',
+      'image/gif',
+      'image/jpeg',
+      'image/pjpeg',
+      'image/png',
+      'image/svg+xml',
+      'image/tiff',
+      'image/webp',
+      `image/x-icon`
+    ];
+
+    function validFileType(file) {
+      return fileTypes.includes(file.type);
+    }
+   
+    function deleteImage(e) {  //각각의 li를 삭제
+      const imgremove = confirm("첨부파일을 삭제 하시겠습니까?"); //삭제하는 시점 에서 대화형 박스띄우기
+
+      if (imgremove == true) {
+        imageCount --; // 변수에서 -1
+        imagepush.pop() //마지막 배열 지우기
+        console.log(imagepush.pop);
+
+        const parentEl = e.target.parentElement;
+        parentEl.remove();
+      }
+      else if (imgremove == false) {
+        return false;
+      }
+    };
+
+
+  </script>
+</body>
+
+</html>
